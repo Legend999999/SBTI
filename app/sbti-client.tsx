@@ -444,9 +444,20 @@ async function loadCanvasImage(src: string) {
   });
 }
 
+async function ensurePosterFont(locale: Locale) {
+  if (locale !== "ckb" || !("fonts" in document)) return;
+  await Promise.all([
+    document.fonts.load('400 32px "Sarchia Qaisy"'),
+    document.fonts.load('700 64px "Sarchia Qaisy"'),
+    document.fonts.ready,
+  ]);
+}
+
 async function renderPoster(canvas: HTMLCanvasElement, result: TestResult, locale: Locale, code: string, layout: PosterLayout, styleName: string, username: string) {
+  await ensurePosterFont(locale);
   const sizes = { story: [1080, 1920], portrait: [1080, 1350], square: [1080, 1080] } as const;
   const [width, height] = sizes[layout];
+  const posterFont = locale === "ckb" ? '"Sarchia Qaisy", Arial' : "Arial";
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
@@ -462,9 +473,9 @@ async function renderPoster(canvas: HTMLCanvasElement, result: TestResult, local
   ctx.textAlign = rtl ? "right" : "left";
   ctx.direction = rtl ? "rtl" : "ltr";
   const x = rtl ? width - 96 : 96;
-  ctx.font = "700 46px Arial";
+  ctx.font = `700 46px ${posterFont}`;
   ctx.fillText("MischiefType", x, 110);
-  ctx.font = "500 58px Arial";
+  ctx.font = `500 58px ${posterFont}`;
   ctx.fillText(result.type.posterCaption[locale], x, height * 0.2);
   ctx.font = "900 160px Arial";
   ctx.direction = "ltr";
@@ -484,11 +495,11 @@ async function renderPoster(canvas: HTMLCanvasElement, result: TestResult, local
   ctx.fillStyle = styleName === "ink" ? "#f9faf7" : "#17211d";
   ctx.direction = rtl ? "rtl" : "ltr";
   ctx.textAlign = "center";
-  ctx.font = "700 64px Arial";
+  ctx.font = `700 64px ${posterFont}`;
   ctx.fillText(result.type.titles[locale], width / 2, height * 0.69);
-  ctx.font = "32px Arial";
+  ctx.font = `32px ${posterFont}`;
   result.topTraits.forEach((trait, index) => ctx.fillText(dimensionLabels[trait][locale], width / 2, height * (0.76 + index * 0.045)));
-  ctx.font = "28px Arial";
+  ctx.font = `28px ${posterFont}`;
   if (username) ctx.fillText(username, width / 2, height - 145);
   ctx.fillText(siteCopy[locale].disclaimer, width / 2, height - 78, width - 120);
 }
