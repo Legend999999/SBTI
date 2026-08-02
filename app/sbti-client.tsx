@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { characterRegistryByCode, type CharacterRecord } from "../lib/characters";
 import {
   answersForType,
   dimensionLabels,
@@ -137,10 +138,10 @@ export default function SBTIApp({ initialLocale }: { initialLocale: Locale }) {
     window.setTimeout(() => setToast(""), 2200);
   }
 
-  function downloadPoster() {
+  async function downloadPoster() {
     const canvas = posterCanvas.current;
     if (!canvas) return;
-    renderPoster(canvas, result, locale, displayCode(result.type), posterLayout, posterStyle, username);
+    await renderPoster(canvas, result, locale, displayCode(result.type), posterLayout, posterStyle, username);
     const link = document.createElement("a");
     link.download = `sbti-${displayCode(result.type).toLowerCase()}-${posterLayout}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -305,11 +306,21 @@ export default function SBTIApp({ initialLocale }: { initialLocale: Locale }) {
 }
 
 function Mascot({ type, code, locale, cloudIndex = 0 }: { type: PersonalityType; code: string; locale: Locale; cloudIndex?: number }) {
+  const character = characterRegistryByCode[type.code];
   return (
-    <span className="mascot" aria-label={type.characterAsset.altText[locale]} style={{ "--accent": type.characterAsset.accent, "--delay": `${cloudIndex * 80}ms` } as React.CSSProperties}>
-      <span className="mascot-head"><span /><i /></span>
-      <span className="mascot-body" />
-      <span className="mascot-prop">{type.characterAsset.backgroundSymbol.slice(0, 1)}</span>
+    <span
+      className="mascot"
+      aria-label={character.alt[locale]}
+      style={{ "--accent": type.characterAsset.accent, "--delay": `${cloudIndex * 80}ms`, "--character-bg": character.backgroundColor } as React.CSSProperties}
+    >
+      <img
+        className="mascot-img"
+        src={character.imageCard}
+        alt={character.alt[locale]}
+        width={character.width}
+        height={character.height}
+        loading={cloudIndex > 2 ? "lazy" : "eager"}
+      />
       <b dir="ltr">{code}</b>
     </span>
   );
@@ -320,7 +331,13 @@ function PosterPreview({ result, locale, code, layout, styleName }: { result: Te
     <div className={`poster-preview ${layout} ${styleName}`}>
       <span className="poster-brand">MischiefType</span>
       <p>My SBTI type is</p>
-      <Mascot type={result.type} code={code} locale={locale} />
+      <img
+        className="poster-character"
+        src={characterRegistryByCode[result.type.code].imagePoster}
+        alt={characterRegistryByCode[result.type.code].alt[locale]}
+        width={characterRegistryByCode[result.type.code].width}
+        height={characterRegistryByCode[result.type.code].height}
+      />
       <h3 dir="ltr">{code}</h3>
       <strong>{result.type.titles[locale]}</strong>
       <small>{result.type.quote[locale]}</small>
@@ -418,7 +435,16 @@ function ChipList({ items }: { items: string[] }) {
   return <div className="chips">{items.map((item) => <span key={item}>{item}</span>)}</div>;
 }
 
-function renderPoster(canvas: HTMLCanvasElement, result: TestResult, locale: Locale, code: string, layout: PosterLayout, styleName: string, username: string) {
+async function loadCanvasImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+async function renderPoster(canvas: HTMLCanvasElement, result: TestResult, locale: Locale, code: string, layout: PosterLayout, styleName: string, username: string) {
   const sizes = { story: [1080, 1920], portrait: [1080, 1350], square: [1080, 1080] } as const;
   const [width, height] = sizes[layout];
   canvas.width = width;
@@ -444,15 +470,24 @@ function renderPoster(canvas: HTMLCanvasElement, result: TestResult, locale: Loc
   ctx.direction = "ltr";
   ctx.textAlign = "center";
   ctx.fillText(code, width / 2, height * 0.42);
+  const character = characterRegistryByCode[result.type.code] as CharacterRecord;
+  try {
+    const image = await loadCanvasImage(character.imagePoster);
+    const imageSize = Math.min(width * 0.58, height * 0.28);
+    ctx.drawImage(image, (width - imageSize) / 2, height * 0.43, imageSize, imageSize);
+  } catch {
+    ctx.fillStyle = character.backgroundColor;
+    ctx.fillRect(width * 0.24, height * 0.45, width * 0.52, height * 0.16);
+  }
   ctx.fillStyle = result.type.characterAsset.accent;
-  ctx.fillRect(width * 0.22, height * 0.47, width * 0.56, height * 0.04);
+  ctx.fillRect(width * 0.22, height * 0.62, width * 0.56, height * 0.026);
   ctx.fillStyle = styleName === "ink" ? "#f9faf7" : "#17211d";
   ctx.direction = rtl ? "rtl" : "ltr";
   ctx.textAlign = "center";
   ctx.font = "700 64px Arial";
-  ctx.fillText(result.type.titles[locale], width / 2, height * 0.58);
+  ctx.fillText(result.type.titles[locale], width / 2, height * 0.69);
   ctx.font = "32px Arial";
-  result.topTraits.forEach((trait, index) => ctx.fillText(dimensionLabels[trait][locale], width / 2, height * (0.67 + index * 0.055)));
+  result.topTraits.forEach((trait, index) => ctx.fillText(dimensionLabels[trait][locale], width / 2, height * (0.76 + index * 0.045)));
   ctx.font = "28px Arial";
   if (username) ctx.fillText(username, width / 2, height - 145);
   ctx.fillText(siteCopy[locale].disclaimer, width / 2, height - 78, width - 120);

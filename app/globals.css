@@ -128,57 +128,22 @@ h3 { font-size: 1.15rem; }
   min-block-size: 148px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: linear-gradient(150deg, color-mix(in srgb, var(--accent), white 78%), var(--surface));
+  background: var(--character-bg, var(--surface));
   box-shadow: var(--shadow);
   animation: idle 4s ease-in-out infinite;
   animation-delay: var(--delay, 0ms);
   isolation: isolate;
   overflow: hidden;
+  padding: 12px;
 }
-.mascot::before {
-  content: "";
-  position: absolute;
-  inset: 14% 18% auto auto;
-  inline-size: 42px;
-  block-size: 42px;
-  rotate: 18deg;
-  background: color-mix(in srgb, var(--accent), transparent 18%);
-  clip-path: polygon(50% 0, 100% 40%, 82% 100%, 14% 92%, 0 28%);
-}
-.mascot-head {
-  position: relative;
-  inline-size: 68px;
-  block-size: 60px;
-  border-radius: 45% 55% 48% 52%;
-  background: #ffe0b2;
-  box-shadow: inset -9px -7px 0 rgba(0,0,0,.1);
-}
-.mascot-head span, .mascot-head i {
-  position: absolute;
-  inset-block-start: 24px;
-  inline-size: 9px;
-  block-size: 9px;
-  border-radius: 50%;
-  background: #17211d;
-}
-.mascot-head span { inset-inline-start: 18px; }
-.mascot-head i { inset-inline-end: 18px; }
-.mascot-body {
-  inline-size: 82px;
-  block-size: 58px;
-  margin-block-start: -6px;
-  border-radius: 24px 24px 18px 18px;
-  background: var(--accent);
-  clip-path: polygon(18% 0, 86% 7%, 100% 72%, 48% 100%, 0 76%);
-}
-.mascot-prop {
-  position: absolute;
-  inset-block-start: 12px;
-  inset-inline-start: 14px;
-  color: var(--accent);
-  font-weight: 900;
-  opacity: .42;
-  font-size: 1.5rem;
+.mascot-img {
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: 176px;
+  max-block-size: 176px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 .mascot b {
   position: absolute;
@@ -228,6 +193,7 @@ h3 { font-size: 1.15rem; }
 }
 .type-card:hover { transform: translateY(-4px); border-color: var(--accent); }
 .type-card .mascot { min-block-size: 150px; box-shadow: none; }
+.type-card .mascot-img { max-inline-size: 152px; max-block-size: 152px; }
 .type-code { color: var(--accent); font-weight: 900; }
 .type-card small, details p, article p, footer { color: var(--muted); line-height: 1.55; }
 .split {
@@ -273,7 +239,14 @@ h3 { font-size: 1.15rem; }
 .poster-preview.square { aspect-ratio: 1; }
 .poster-preview.mint { background: #dff5e9; }
 .poster-preview.ink { background: #111716; color: #f7f3ea; }
-.poster-preview .mascot { inline-size: 150px; min-block-size: 150px; box-shadow: none; }
+.poster-character {
+  inline-size: min(70%, 180px);
+  block-size: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
 .poster-preview h3 { font-size: 3rem; margin: 0; }
 .poster-brand { font-weight: 900; }
 .feature-grid {
@@ -339,6 +312,7 @@ summary { cursor: pointer; font-weight: 900; }
   margin-block-end: 26px;
 }
 .result-hero .mascot { min-block-size: 420px; }
+.result-hero .mascot-img { max-inline-size: 380px; max-block-size: 380px; }
 .result-hero h1 { font-size: clamp(3rem, 7vw, 6.2rem); }
 .result-hero h2 { font-size: clamp(1.5rem, 3vw, 2.6rem); color: var(--accent); }
 .result-grid {
@@ -414,4 +388,70 @@ footer {
   .character-cloud { grid-template-columns: repeat(2, 1fr); }
   .proof { grid-template-columns: 1fr; }
   .section-heading { display: grid; align-items: start; }
+}
+
+.audit-page {
+  padding: clamp(20px, 5vw, 72px);
+}
+.audit-page header {
+  max-inline-size: 980px;
+  margin-block-end: 26px;
+}
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.audit-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.audit-meta {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .86rem;
+  overflow-wrap: anywhere;
+}
+.audit-meta > b {
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: 50%;
+  color: white;
+  background: var(--accent);
+}
+.audit-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.audit-images figure {
+  margin: 0;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--bg);
+  text-align: center;
+}
+.audit-images img {
+  inline-size: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+.audit-images figcaption {
+  color: var(--muted);
+  font-size: .75rem;
+}
+.warning {
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #7a2c00;
+  background: #ffedd5;
 }
