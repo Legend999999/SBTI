@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         en: "/en",
         ckb: "/ckb",
         ar: "/ar",
-      },
+      } as Record<string, string>,
     },
     openGraph: {
       title: copy.meta.title,

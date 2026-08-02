@@ -277,7 +277,7 @@ export const personalityTypes: PersonalityType[] = typeSeeds.map(([code, safeCod
   },
 })) as PersonalityType[];
 
-export const questions: Question[] = [
+const questionRows: Array<[string, Dimension, string, string, string, boolean?]> = [
   ["q1", "selfConfidence", "I can hype myself up without needing a full committee.", "دەتوانم خۆم هان بدەم بێ ئەوەی تیمێکی تەواوم پێویست بێت.", "أستطيع تشجيع نفسي دون لجنة كاملة."],
   ["q2", "selfClarity", "I usually know what is really bothering me.", "زۆرجار دەزانم بە ڕاستی چی بێزارم دەکات.", "غالبا أعرف ما الذي يزعجني فعلا."],
   ["q3", "selfAcceptance", "I can laugh at myself without turning it into self-destruction.", "دەتوانم بە خۆم پێبکەنم بێ ئەوەی بیکەم بە خۆشکاندن.", "أستطيع الضحك على نفسي دون أن يتحول الأمر لهدم الذات."],
@@ -310,9 +310,11 @@ export const questions: Question[] = [
   ["q30", "boundaries", "I help people even when my own battery is blinking red.", "یارمەتی خەڵک دەدەم تەنانەت کاتێک باتریی خۆم سوور دەچنچنێت.", "أساعد الناس حتى عندما بطاريتي تومض بالأحمر.", true],
   ["q31", "selfClarity", "I notice the reason behind my reaction before I explain it.", "پێش ڕوونکردنەوەی کاردانەوەکەم هۆکارەکەی دەبینم.", "ألاحظ سبب ردة فعلي قبل أن أشرحها."],
   ["q32", "executionConsistency", "Deadlines turn me into a strangely focused machine.", "دوا وادەکان دەمکەن بە ئامێرێکی سەیر بەڵام متمرکز.", "المواعيد النهائية تحولني إلى آلة مركزة بشكل غريب."],
-].map(([id, dimension, en, ckb, ar, reverse]) => ({
+];
+
+export const questions: Question[] = questionRows.map(([id, dimension, en, ckb, ar, reverse]) => ({
   id,
-  dimension: dimension as Dimension,
+  dimension,
   text: { en, ckb, ar },
   reverse: Boolean(reverse),
   active: true,
