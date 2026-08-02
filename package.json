@@ -6,11 +6,12 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
-    "build": "vinext build",
+    "dev": "next dev",
+    "build": "next build",
+    "build:sites": "vinext build",
     "build:pages": "next build",
-    "start": "vinext start",
-    "test": "npm run build && node --experimental-strip-types --test tests/*.test.mjs",
+    "start": "next start",
+    "test": "npm run build:sites && node --experimental-strip-types --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },
